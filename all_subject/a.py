@@ -20,7 +20,7 @@ def convert_to_numeric(val):
             return None  # or some other value indicating an error
 
 
-models = ['deep4net', 'inception', 'eegnetv4', 'eegnetv1', 'shallow']
+models = ['Deep4Net', 'Inception', 'EEGNetv4', 'CTCNN', 'Shallow']
 models1=['deep4.Deep4Net','eeginception_mi.EEGInceptionMI','eegnet.EEGNetv4','eegnet.EEGNetv1','shallow_fbcsp.ShallowFBCSPNet']
 
 # List of subtypes
@@ -45,23 +45,45 @@ df_all = pd.concat(dataframes, ignore_index=True)
 df_all['model_subtype'] = df_all['model'] + "_" + df_all['subtype']
 
 # Create a color palette with a different color for each model
-palette = dict(zip(models, sns.color_palette('Set2', n_colors=len(models))))
+palette_model = dict(zip(df_all['model'].unique(), sns.color_palette('Set2', n_colors=len(df_all['model'].unique()))))
 
 # Map each 'model' to a color
-df_all['color'] = df_all['model'].map(palette)
+df_all['color'] = df_all['model'].map(palette_model)
+
 
 # Create a boxplot
-# sns.boxplot(x='model_subtype', y='best_val_acc', data=df_all, palette=df_all.set_index('model_subtype')['color'].to_dict())
-sns.boxplot(x='model_subtype', y='best_test_acc', data=df_all, palette=df_all.set_index('model_subtype')['color'].to_dict())
+# box_plot = sns.boxplot(x='model_subtype', y='best_val_acc', data=df_all, hue='model', palette=palette_model)
+box_plot = sns.boxplot(x='model_subtype', y='best_test_acc', data=df_all, hue='model', palette=palette_model)
+
+
+
+# Get the medians for each box in the boxplot
+# medians = df_all.groupby(['model_subtype'])['best_val_acc'].median()
+medians = df_all.groupby(['model_subtype'])['best_test_acc'].median()
+
+
+# Add model names above the boxes with increased font size
+# for i, model in enumerate(df_all['model'].unique()):
+#     # Calculate the midpoint of the three subtypes for each model
+#     midpoint = i * len(df_all['subtype'].unique()) + len(df_all['subtype'].unique()) / 2 - 0.5
+#     box_plot.text(x=midpoint, y=df_all['best_val_acc'].max(), s=model, horizontalalignment='center', fontsize=18, verticalalignment='bottom')
+
+for i, model in enumerate(df_all['model'].unique()):
+    # Calculate the midpoint of the three subtypes for each model
+    midpoint = i * len(df_all['subtype'].unique()) + len(df_all['subtype'].unique()) / 2 - 0.5
+    box_plot.text(x=midpoint, y=df_all['best_test_acc'].max(), s=model, horizontalalignment='center', fontsize=18, verticalalignment='bottom')
+
+# plt.title('Box Plot of Best validation Accuracy by Model and Subtype', fontsize=15)
+# plt.ylabel('Best validation Accuracy', fontsize=16)
+# plt.legend().remove()
+# plt.xticks(range(len(df_all['model_subtype'].unique())), df_all['subtype'].unique().tolist() * len(df_all['model'].unique()),fontsize=18)
+# plt.tight_layout()
+# plt.show()
+
 
 plt.title('Box Plot of Best test Accuracy by Model and Subtype', fontsize=15)
-plt.xlabel('Model_Subtype', fontsize=12)
-plt.ylabel('Best test Accuracy', fontsize=12)
-# plt.title('Box Plot of Best validation Accuracy by Model and Subtype', fontsize=15)
-# plt.xlabel('Model_Subtype', fontsize=12)
-# plt.ylabel('Best validation Accuracy', fontsize=12)
-
-plt.xticks(rotation=360)  # Rotate x-axis labels for better visibility
-
+plt.ylabel('Best test Accuracy', fontsize=16)
+plt.legend().remove()
+plt.xticks(range(len(df_all['model_subtype'].unique())), df_all['subtype'].unique().tolist() * len(df_all['model'].unique()),fontsize=18)
 plt.tight_layout()
 plt.show()
