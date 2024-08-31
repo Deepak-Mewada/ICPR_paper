@@ -5,7 +5,7 @@ import seaborn as sns
 
 # Define your data
 data = {
-    'model': ['Shallow FBCSP', 'CTCNN', 'EEGNet v4', 'Inception MI', 'Deep4Net'],
+    'model': ['Shallow FBCSP', 'EEGNet v1', 'EEGNet v4', 'Inception MI', 'Deep4Net'],
     'accuracy': [62.31,67.52,74.56,55.46,63.21]
 }
 
